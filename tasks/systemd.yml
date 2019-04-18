@@ -30,6 +30,6 @@
     port: "{{ item }}"
     delay: 5
     connect_timeout: 1
-  when: redis-sentinel_activate
+  when: redis_sentinel_activate
   with_items:
     - "{{ redis_sentinel_port }}"
