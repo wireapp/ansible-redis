@@ -1,0 +1,7 @@
+---
+- import_tasks: swapoff.yml
+  when: cassandra_disable_swap
+
+- import_tasks: systemd.yml
+  tags:
+    - systemd
