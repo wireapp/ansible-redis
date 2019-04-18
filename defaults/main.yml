@@ -30,3 +30,6 @@ redis_groupname: redis
 
 # start redis immediately via systemd?
 redis_activate: true
+
+# start redis-setinel immediately via systemd?
+redis_sentinel_activate: true
