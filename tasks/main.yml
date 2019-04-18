@@ -1,6 +1,4 @@
 ---
-- import_tasks: disable_getty.yml
-
 - import_tasks: swapoff.yml
   when: redis_disable_swap
 
