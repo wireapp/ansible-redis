@@ -1,0 +1,13 @@
+---
+- name: disables transparent-huge-pages
+  copy:
+    src: roles-external/disable_transparent_huge_pages/files/disable-transparent-hugepages
+    dest: "/etc/init.d/disable-transparent-hugepages"
+    mode: 0755
+
+# the reason to use shell here is that ansible's 'service' module by now assumes systemd,
+# and doesn't work well with init.d startup scripts
+# See https://github.com/ansible/ansible/issues/19422
+# this problem might be solved by using ansible > 2.2 or servers with proper systemd (not ubuntu 14)
+- name: run service disable transparent hugepages
+  shell: service disable-transparent-hugepages start

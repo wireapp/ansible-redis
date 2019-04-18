@@ -1,6 +1,14 @@
 ---
+- import_tasks: disable_getty.yml
+
 - import_tasks: swapoff.yml
-  when: cassandra_disable_swap
+  when: redis_disable_swap
+
+- import_tasks: setup.yml
+
+- import_tasks: install.yml
+
+- import_tasks: setup_redis.yml
 
 - import_tasks: systemd.yml
   tags:

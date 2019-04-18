@@ -1,35 +1,35 @@
 ---
-- name: extra environment variables file for systemd unit
-  template:
-    src: env.sh.j2
-    dest: '{{ cassandra_link_dir }}/env.sh'
-    mode: 0644
-    owner: '{{ cassandra_user }}'
-    group: '{{ cassandra_group }}'
-
-- name: install systemd cassandra.service unit
-  template:
-    src: '{{ item }}.j2'
-    dest: '/etc/systemd/system/{{ item }}'
-    mode: 0644
-  register: cassandra_service_installed
-  with_items:
-    - cassandra.service
-
-- name: enable and start cassandra systemd service
+- name: enable, and start redis.
   systemd:
-    name: cassandra.service
-    daemon_reload: "{{ cassandra_service_installed.changed }}"
+    name: "redis-server.service"
     enabled: true
+    masked: false
     state: started
-  when: cassandra_activate
 
-- name: Wait for cassandra to startup
+
+- name: Wait for redis to startup
   wait_for:
     host: "{{ ansible_default_ipv4.address }}"
     port: "{{ item }}"
     delay: 5
     connect_timeout: 1
-  when: cassandra_activate
+  when: redis_activate
   with_items:
-    - "{{ cassandra_native_transport_port }}"
+    - "{{ redis_port }}"
+
+- name: enable, and start redis-sentinel.
+  systemd:
+    name: "redis-sentinel.service"
+    enabled: true
+    masked: false
+    state: started
+
+- name: Wait for redis-sentinel to startup
+  wait_for:
+    host: "{{ ansible_default_ipv4.address }}"
+    port: "{{ item }}"
+    delay: 5
+    connect_timeout: 1
+  when: redis-sentinel_activate
+  with_items:
+    - "{{ redis_sentinel_port }}"

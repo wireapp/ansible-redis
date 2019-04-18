@@ -1,0 +1,10 @@
+---
+- name: install redis from debian
+  apt:
+    pkg: redis-server
+    state: present
+
+- name: install redis-sentinel from debian
+  apt:
+    pkg: redis-sentinel
+    state: present

@@ -1,0 +1,6 @@
+---
+- name: disable redis binding to ::1(ipv6)
+  replace:
+    path: /etc/redis/redis.conf
+    regexp: 'bind 127.0.0.1.*'
+    replace: 'bind 0.0.0.0'

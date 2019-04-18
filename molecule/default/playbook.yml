@@ -1,11 +1,13 @@
 ---
 - name: Converge
   hosts: all
-  # pre_tasks:
+  pre_tasks:
   #   - name: Ensure apt cache is updated
   #     apt:
   #       update_cache: true
   #     changed_when: false
   #     when: ansible_os_family == 'Debian'
+  - name: import yaml to disable gettys.
+    import_tasks: disable_getty.yml
   roles:
     - ansible-redis
