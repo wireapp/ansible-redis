@@ -11,8 +11,8 @@ redis_sentinel_port: 26379
 # redis_install_parent_dir: "/opt"
 # redis_link_dir: "/opt/redis"
 # redis_install_dir: "{{ redis_install_parent_dir }}/redis-{{ redis_version }}"
-# redis_group: redis
-# redis_user: redis
+redis_group: redis
+redis_user: redis
 # redis_shortcut_path: /usr/local/bin
 
 # # config parameters
