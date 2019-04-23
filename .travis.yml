@@ -8,7 +8,7 @@ branches:
 
 env:
   global:
-    - ROLE_NAME: ansible-cassandra
+    - ROLE_NAME: ansible-redis
   matrix:
     - MOLECULE_DISTRO: ubuntu1604
     - MOLECULE_DISTRO: ubuntu1804
