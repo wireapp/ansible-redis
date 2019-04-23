@@ -6,7 +6,7 @@ driver:
 lint:
   name: yamllint
 platforms:
-  # Two containers, one in the group 'cassandra' and one in the group 'cassandra_seed'
+  # three instances, in the 'redis' group.
   - name: instance
     # for systemd, use these base images:
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-ubuntu1804}-ansible:latest"
