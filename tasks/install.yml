@@ -1,10 +1,10 @@
 ---
-- name: install redis from debian
+- name: install redis from ubuntu
   apt:
     pkg: redis-server
     state: present
 
-- name: install redis-sentinel from debian
+- name: install redis-sentinel from ubuntu
   apt:
     pkg: redis-sentinel
     state: present
