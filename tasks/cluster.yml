@@ -1,0 +1,36 @@
+---
+- name: drop cluster config file
+  template:
+    src: redis_cluster.conf.j2
+    dest: /etc/redis/redis_cluster.conf
+    mode: 0644
+    owner: '{{ redis_user }}'
+    group: '{{ redis_group }}'
+
+- name: include cluster config file from redis.conf
+  shell: grep -qF -- "include /etc/redis/redis_cluster.conf" "/etc/redis/redis.conf" || echo "include /etc/redis/redis_cluster.conf" >> /etc/redis/redis.conf
+
+- name: restart redis
+  systemd:
+    name: redis
+    state: restarted
+    daemon_reload: true
+    
+
+- name: meet cluster nodes
+  shell: "{{ groups['redis'] | map('extract', hostvars, ['ansible_eth0', 'ipv4', 'address']) | map('regex_replace', '^(.*)$','redis-cli cluster meet \\1 6379') | join (' && ') }}"
+  when: ansible_hostname == 'instance'
+
+
+- name: add slots to primary node
+  shell: redis-cli cluster addslots $(seq 0 5460)
+  when: ansible_hostname == 'instance'
+
+- name: add slots to secondary node
+  shell: redis-cli cluster addslots $(seq 5461 10922)
+  when: ansible_hostname == 'instance2'
+
+- name: add slots to tertiary node
+  shell: redis-cli cluster addslots $(seq 10923 16383)
+  when: ansible_hostname == 'instance3'
+    
