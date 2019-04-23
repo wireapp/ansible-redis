@@ -30,6 +30,7 @@ platforms:
     privileged: true  # for systemd
     groups:
       - redis
+      - redis_slave
     pre_build_image: true
   - name: instance3
     # for systemd, use these base images:
@@ -42,6 +43,7 @@ platforms:
     privileged: true  # for systemd
     groups:
       - redis
+      - redis_slave
     pre_build_image: true
 provisioner:
   name: ansible
