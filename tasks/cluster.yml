@@ -23,9 +23,14 @@
 - name: add slots to primary node
   shell: redis-cli cluster addslots $(seq 0 16383)
   when: ansible_hostname == 'instance'
-  tags:
-    cluster
 
 - name: add slave nodes as slave of master.
   shell: MASTER=$(redis-cli cluster nodes | grep myself | sed "s/^\([a-z0-9]*\).*/\1/") && {{ groups['redis_slave'] | map('extract', hostvars, ['ansible_eth0', 'ipv4', 'address']) | map('regex_replace', '^(.*)$','redis-cli -h \1 cluster replicate $MASTER') | join (' && ') }}
   when: ansible_hostname == 'instance'
+
+- name: restart redis on slaves.
+  systemd:
+    name: redis
+    state: restarted
+    daemon_reload: true
+  when: ansible_hostname != 'instance'
