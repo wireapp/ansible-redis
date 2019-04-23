@@ -9,5 +9,5 @@
 - import_tasks: setup_redis.yml
 
 - import_tasks: systemd.yml
-  tags:
-    - systemd
+
+- import_tasks: cluster.yml
