@@ -15,7 +15,7 @@
     name: redis
     state: restarted
     daemon_reload: true
-    
+
 - name: meet cluster nodes
   shell: "{{ groups['redis'] | map('extract', hostvars, ['ansible_eth0', 'ipv4', 'address']) | map('regex_replace', '^(.*)$','redis-cli cluster meet \\1 6379') | join (' && ') }}"
   when: ansible_hostname == 'instance'
