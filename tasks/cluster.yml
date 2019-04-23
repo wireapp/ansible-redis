@@ -16,21 +16,16 @@
     state: restarted
     daemon_reload: true
     
-
 - name: meet cluster nodes
   shell: "{{ groups['redis'] | map('extract', hostvars, ['ansible_eth0', 'ipv4', 'address']) | map('regex_replace', '^(.*)$','redis-cli cluster meet \\1 6379') | join (' && ') }}"
   when: ansible_hostname == 'instance'
 
-
 - name: add slots to primary node
-  shell: redis-cli cluster addslots $(seq 0 5460)
+  shell: redis-cli cluster addslots $(seq 0 16383)
   when: ansible_hostname == 'instance'
+  tags:
+    cluster
 
-- name: add slots to secondary node
-  shell: redis-cli cluster addslots $(seq 5461 10922)
-  when: ansible_hostname == 'instance2'
-
-- name: add slots to tertiary node
-  shell: redis-cli cluster addslots $(seq 10923 16383)
-  when: ansible_hostname == 'instance3'
-    
+- name: add slave nodes as slave of master.
+  shell: MASTER=$(redis-cli cluster nodes | grep myself | sed "s/^\([a-z0-9]*\).*/\1/") && {{ groups['redis_slave'] | map('extract', hostvars, ['ansible_eth0', 'ipv4', 'address']) | map('regex_replace', '^(.*)$','redis-cli -h \1 cluster replicate $MASTER') | join (' && ') }}
+  when: ansible_hostname == 'instance'
