@@ -1,0 +1,53 @@
+---
+- name: pause sentinels
+  systemd:
+    name: redis-sentinel
+    state: stopped
+    daemon_reload: true
+
+- name: force sentinels to announce an IP.
+  shell: grep -qE -- "^sentinel announce-ip" "/etc/redis/sentinel.conf" || echo "sentinel announce-ip "$(ip addr | grep inet | grep eth0 | sed "s=.*inet \(.*\)/.*=\1=") >> /etc/redis/sentinel.conf
+
+- name: force sentinels to bind to 0.0.0.0
+  shell: grep -qE -- "^bind" "/etc/redis/sentinel.conf" || echo "bind 0.0.0.0" >> /etc/redis/sentinel.conf
+
+- name: force sentinels to announce their current IP.
+  shell: IPADDR=$(ip addr | grep inet | grep eth0 | sed "s=.*inet \(.*\)/.*=\1=") && sed -i "s/^sentinel announce-ip .*/sentinel announce-ip $IPADDR/" /etc/redis/sentinel.conf
+
+- name: resume sentinels
+  systemd:
+    name: redis-sentinel
+    state: started
+    daemon_reload: true
+
+- name: reconfigure sentinels to forget their current master
+  shell: redis-cli -p {{ redis_sentinel_port }} sentinel remove mymaster
+  when: ansible_hostname != 'instance'
+
+- name: set redis to run outside of protected mode
+  shell: redis-cli config set protected-mode no
+  
+- name: restart redis on slaves.
+  systemd:
+    name: redis
+    state: restarted
+    daemon_reload: true
+  when: ansible_hostname != 'instance'
+
+- name: add slave nodes as slave of master.
+  shell: MASTER=$(ip addr | grep inet | grep eth0 | sed "s=.*inet \(.*\)/.*=\1=") && {{ groups['redis_slave'] | map('extract', hostvars, ['ansible_eth0', 'ipv4', 'address']) | map('regex_replace', '^(.*)$','redis-cli -h \1 slaveof $MASTER 6379') | join (' && ') }}
+  when: ansible_hostname == 'instance'
+
+  
+- name: use slave redis config to tell sentinels who their master is
+  shell: MASTER=$(redis-cli info | grep master_host | sed "s/master_host://") && redis-cli -p 26379 sentinel monitor mymaster $MASTER 6379 2
+  when: ansible_hostname != 'instance'
+
+- name: tell master sentinel to find master by ip.
+  shell: MASTER=$(ip addr | grep inet | grep eth0 | sed "s=.*inet \(.*\)/.*=\1=") && redis-cli -p 26379 sentinel monitor mymaster $MASTER 6379 2
+  when: ansible_hostname != 'instance'
+
+- name: force sentinels to redetect eachother
+  shell: redis-cli -p 26379 sentinel reset '*'
+  when: ansible_hostname == 'instance'
+
