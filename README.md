@@ -4,8 +4,9 @@ Ansible role to install a redis cluster supervised by systemd. Includes the foll
 
 * disables swap.
 
+* disables gettys when running in molecule.
 
-
+* installs three nodes of redis in a master-slave-slave configuration. Failover using Sentinels is tested.
 
 **Status: active development**
 
@@ -14,19 +15,20 @@ Ansible role to install a redis cluster supervised by systemd. Includes the foll
 <!-- vim-markdown-toc GFM -->
 
 * [Ansible Requirements](#ansible-requirements)
+* [Platforms](#platforms)
+* [License](#license)
+* [Development Setup](#development-setup)
 
 
 ## Ansible Requirements
 
-- ansible >= 2.4 (>= 2.7.9 recommended)
+- ansible >= 2.4 (>= 2.7.9 recommended) (2.7.1 tested)
 
 For a list of all variables, see `defaults/main.yml`.
 
-
 ## Platforms
 
-- Currently tested with ubuntu 16.04 and 18.04.
-
+- Currently tested with ubuntu 18.04.
 
 ## License
 

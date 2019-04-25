@@ -10,5 +10,7 @@
 
 - import_tasks: systemd.yml
 
-#- import_tasks: cluster.yml
+# the skeleton of a clustered configuration. needs work.
+# - import_tasks: cluster.yml
+
 - import_tasks: failover.yml
