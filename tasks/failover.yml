@@ -4,32 +4,24 @@
     reconfig_sentinel: false
 
 - name: check if we need to force sentinels to listen globally.
-  lineinfile:
-    path: /etc/redis/sentinel.conf
-    regex: "^bind 0.0.0.0"
-    state: absent
-  check_mode: true
+  shell: grep -E "^bind 0.0.0.0" /etc/redis/sentinel.conf || true
   changed_when: false
   register: bind_present
 
 - name: register results.
   set_fact:
     reconfig_sentinel: true
-  when: not bind_present.changed
+  when: '"bind" not in bind_present.stdout'
 
 - name: check if we need to force sentinels to announce on their external IP.
-  lineinfile:
-    path: /etc/redis/sentinel.conf
-    regex: '^sentinel announce-ip "{{ ansible_eth0.ipv4.address }}"'
-    state: absent
-  check_mode: true
+  shell: grep -E '^sentinel announce-ip "{{ ansible_eth0.ipv4.address }}"' /etc/redis/sentinel.conf || true
   changed_when: false
   register: announce_ip_present
 
 - name: register results.
   set_fact:
     reconfig_sentinel: true
-  when: not announce_ip_present.changed
+  when: '"announce" not in announce_ip_present.stdout'
 
 - name: pause sentinels
   systemd:
