@@ -1,19 +1,10 @@
 ---
 # defaults file for ansible-redis
 
-# redis_version: '5.0.4'
-# redis_sha256: '3ce9ceff5a23f60913e1573f6dfcd4aa53b42d4a2789e28fa53ec2bd28c987dd'
-# redis_file: 'redis-{{ redis_version }}.tar.gz'
-# redis_mirror: 'http://download.redis.io/releases/'
-# redis_url: '{{ redis_mirror }}/{{ redis_version }}/{{ redis_file }}'
 redis_port: 6379
 redis_sentinel_port: 26379
-# redis_install_parent_dir: "/opt"
-# redis_link_dir: "/opt/redis"
-# redis_install_dir: "{{ redis_install_parent_dir }}/redis-{{ redis_version }}"
 redis_group: redis
 redis_user: redis
-# redis_shortcut_path: /usr/local/bin
 
 # # config parameters
 #
@@ -23,8 +14,6 @@ redis_disable_swap: true
 
 # FIXME: metrics later.
 # redis_metrics_prefix: 'redis_{{ redis_cluster_name }}'
-
-# redis_network_interface: "{% if ansible_default_ipv4 is defined %}{{ ansible_default_ipv4.interface }}{% else %}eth0{% endif %}"
 
 redis_groupname: redis
 
