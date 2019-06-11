@@ -106,7 +106,7 @@
 - name: pick a host at random
   set_fact:
     random_host="{{ groups['redis'] | random }}"
-  when: ansible_hostname == groups['redis'][0]
+  when: inventory_hostname == groups['redis'][0]
 
 - name: propogate our decision
   set_fact:
@@ -120,7 +120,7 @@
 
 - name: add slave nodes as slave of master.
   shell: MASTER={{ hostvars[random_host]['ansible_' + redis_network_interface]['ipv4']['address'] }} && redis-cli slaveof $MASTER {{ redis_port }}
-  when: ansible_hostname != random_host and initialize_redis|bool
+  when: inventory_hostname != random_host and initialize_redis|bool
 
 - name: force sentinels to forget their current master
   shell: redis-cli -p {{ redis_sentinel_port }} sentinel remove mymaster
