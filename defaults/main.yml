@@ -22,3 +22,6 @@ redis_activate: true
 
 # start redis-setinel immediately via systemd?
 redis_sentinel_activate: true
+
+# The network interface to make services available on.
+redis_network_interface: "{% if ansible_default_ipv4 is defined %}{{ ansible_default_ipv4.interface }}{% else %}eth0{% endif %}"
