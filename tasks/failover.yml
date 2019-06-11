@@ -27,28 +27,28 @@
   systemd:
     name: redis-sentinel
     state: stopped
-  when: reconfig_sentinel
+  when: reconfig_sentinel|bool
 
 - name: ensure sentinels bind to 0.0.0.0
   lineinfile:
     path: /etc/redis/sentinel.conf
     regexp: '^bind'
     line: 'bind 0.0.0.0'
-  when: reconfig_sentinel
+  when: reconfig_sentinel|bool
 
 - name: ensure sentinels announce their external IP address
   lineinfile:
     path: /etc/redis/sentinel.conf
     regexp: '^sentinel announce-ip'
     line: 'sentinel announce-ip "{{ ansible_eth0.ipv4.address }}"'
-  when: reconfig_sentinel
+  when: reconfig_sentinel|bool
 
 - name: resume sentinels
   systemd:
     name: redis-sentinel
     state: started
     daemon_reload: true
-  when: reconfig_sentinel
+  when: reconfig_sentinel|bool
 
 - name: initialize redis protected mode flag
   set_fact:
@@ -66,7 +66,7 @@
 
 - name: disable redis protected mode.
   command: redis-cli config set protected-mode no
-  when: disable_protected_mode
+  when: disable_protected_mode|bool
 
 
 - name: initialize initialize redis flag
@@ -106,31 +106,31 @@
 - name: pick a host at random
   set_fact:
     random_host="{{ groups['redis'] | random }}"
-  when: ansible_hostname == 'instance'
+  when: ansible_hostname == groups['redis'][0]
 
 - name: propogate our decision
   set_fact:
-    random_host="{{ hostvars['instance']['random_host'] }}"
+    random_host="{{ hostvars[groups['redis'][0]]['random_host'] }}"
   run_once: true
 
 - name: promote a random host.
   shell: redis-cli -h {{ hostvars[random_host]['ansible_eth0']['ipv4']['address'] }} INCR ansiblelovesme
-  when: initialize_redis
+  when: initialize_redis|bool
   run_once: true
 
 - name: add slave nodes as slave of master.
   shell: MASTER={{ hostvars[random_host]['ansible_eth0']['ipv4']['address'] }} && redis-cli slaveof $MASTER {{ redis_port }}
-  when: ansible_hostname != random_host and initialize_redis
+  when: ansible_hostname != random_host and initialize_redis|bool
 
 - name: force sentinels to forget their current master
   shell: redis-cli -p {{ redis_sentinel_port }} sentinel remove mymaster
-  when: initialize_redis
+  when: initialize_redis|bool
 
 - name: tell sentinels who their master is
   shell: MASTER={{ hostvars[random_host]['ansible_eth0']['ipv4']['address'] }} && redis-cli -p {{ redis_sentinel_port }} sentinel monitor mymaster $MASTER {{ redis_port }} $((({{groups['redis'] | length}}/2)+1))
-  when: initialize_redis
+  when: initialize_redis|bool
 
 - name: force sentinels to redetect eachother
   shell: redis-cli -p {{ redis_sentinel_port }} sentinel reset '*'
   run_once: true
-  when: initialize_redis
+  when: initialize_redis|bool
