@@ -26,7 +26,7 @@
 
 - name: Wait for redis-sentinel to startup
   wait_for:
-    host: "{{ ansible_default_ipv4.address }}"
+    host: "127.0.0.1"
     port: "{{ item }}"
     delay: 5
     connect_timeout: 1
