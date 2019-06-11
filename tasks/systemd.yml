@@ -13,7 +13,7 @@
     port: "{{ item }}"
     delay: 5
     connect_timeout: 1
-  when: redis_activate
+  when: redis_activate|bool
   with_items:
     - "{{ redis_port }}"
 
@@ -30,6 +30,6 @@
     port: "{{ item }}"
     delay: 5
     connect_timeout: 1
-  when: redis_sentinel_activate
+  when: redis_sentinel_activate|bool
   with_items:
     - "{{ redis_sentinel_port }}"
